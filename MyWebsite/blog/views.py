@@ -31,12 +31,12 @@ def like_post(request):
         post.liked_by.add(request.user)
     post.save()
     context = {
-        'posts': Post.objects.all(),
+        'posts': Post.objects.all().order_by('-date_posted'),
         'title': 'Home'
     }
-    #return render(request, 'blog/home.html', context)
+    return render(request, 'blog/home.html', context)
 
-    return HttpResponseRedirect(post.get_absolute_url())
+    #return HttpResponseRedirect(post.get_absolute_url())
 
 
 class PostListView(ListView):
@@ -44,7 +44,7 @@ class PostListView(ListView):
     template_name = 'blog/home.html' #<app>/<model>_<viewtype>.html
     context_object_name = 'posts'
     ordering = ['-date_posted']
-    paginate_by = 3
+    #paginate_by = 3
 
 
 class UserPostListView(ListView):
