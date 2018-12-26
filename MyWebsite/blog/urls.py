@@ -10,4 +10,9 @@ urlpatterns=[
     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
     path('post/', views.like_post, name='post-like'),
     path('about/', views.about, name='blog-about'),
+
+
+
+    path('post/create/',views.post_new,name='post_new'),
+    path('post/<int:pk>/edit',views.post_edit,name='post_edit'),
 ]

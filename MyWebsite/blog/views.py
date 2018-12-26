@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404,redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post
 from django.urls import reverse_lazy
@@ -6,6 +6,8 @@ from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
+
+from .forms import PostForm
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -64,7 +66,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title','content']
+    fields = ['title','image','content']
     success_url = reverse_lazy('blog-home')
 
     def form_valid(self, form):
@@ -74,7 +76,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title','content']
+    fields = ['title','image','content']
     #success_url = reverse_lazy('blog-home')
 
     def form_valid(self, form):
@@ -114,4 +116,37 @@ class PostList(APIView):
 
     def post(self):
         pass
+
+
+
+
+
+
+def post_new(request):
+    if request.method=='POST':
+        form=PostForm(request.POST)
+        if form.is_valid():
+            post=form.save(commit=False)
+            post.author=request.user
+            post.save()
+            return redirect('post-detail',pk=post.pk)
+    else:
+        form=PostForm()
+    return render(request,'blog/post_create.html',{'form':form})
+
+
+def post_edit(request,pk):
+    post=get_object_or_404(Post,pk=pk)
+    if request.method=='POST':
+        form=PostForm(request.POST,instance=post)
+        if form.is_valid():
+            post=form.save(commit=False)
+            post.author=request.user
+            post.save()
+            return redirect('post-detail',pk=post.pk)
+    else:
+        form=PostForm(instance=post)
+    return render(request,'blog/post_create.html',{'form':form})
+
+
 
